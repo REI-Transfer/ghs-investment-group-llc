@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Home, ArrowRight, ArrowLeft, Check, XCircle } from "lucide-react"
+import { ArrowRight, ArrowLeft, Check, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { captureTrackingData, getIPAddress, readGfSid } from "@/lib/tracking"
 import { Input } from "@/components/ui/input"
@@ -549,21 +549,15 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
     <div className="w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
       <div className="flex flex-col gap-5">
         {/* Progress indicator */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-[var(--accent)]" />
-            <span className="text-sm text-gray-600">Step {displayStep} of {visibleSteps}</span>
-          </div>
-          <div className="flex gap-1">
-            {Array.from({ length: visibleSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 w-6 rounded-full transition-colors ${
-                  i < displayStep ? "bg-[var(--accent)]" : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: visibleSteps }).map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                i < displayStep ? "bg-[var(--accent)]" : "bg-gray-200"
+              }`}
+            />
+          ))}
         </div>
 
         {step === 1 && (
