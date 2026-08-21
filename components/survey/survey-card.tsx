@@ -454,7 +454,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
     <button
       key={option.id}
       onClick={() => handleOptionSelect(field, option.id)}
-      className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
+      className={`w-full rounded-xl border px-5 py-4 text-left text-base font-medium transition-all md:px-6 md:py-5 md:text-lg ${
         selectedValue === option.id
           ? "border-[var(--accent)] bg-[var(--accent)]/10 text-gray-900"
           : "border-gray-200 bg-white text-gray-700 hover:border-[var(--accent)]/50 hover:bg-gray-50"
@@ -565,7 +565,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">What type of property is it?</h2>
               <p className="mt-1 text-sm text-gray-500">Select the option that best describes your property.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {PROPERTY_TYPE_OPTIONS.map((option) => renderOptionButton(option, surveyData.propertyType, "propertyType"))}
             </div>
           </div>
@@ -577,7 +577,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">What condition is the property in?</h2>
               <p className="mt-1 text-sm text-gray-500">Be honest - we buy houses in any condition.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {CONDITION_OPTIONS.map((option) => renderOptionButton(option, surveyData.condition, "condition"))}
             </div>
           </div>
@@ -589,7 +589,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">Is the property currently listed on the market?</h2>
               <p className="mt-1 text-sm text-gray-500">Let us know if the property is currently for sale.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {LISTED_OPTIONS.map((option) => renderOptionButton(option, surveyData.listedOnMarket, "listedOnMarket"))}
             </div>
           </div>
@@ -601,7 +601,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">How fast are you looking to sell?</h2>
               <p className="mt-1 text-sm text-gray-500">Select your ideal timeline for closing.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {TIMELINE_OPTIONS.map((option) => renderOptionButton(option, surveyData.timeline, "timeline"))}
             </div>
           </div>
@@ -613,7 +613,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">What's your reason for selling?</h2>
               <p className="mt-1 text-sm text-gray-500">This helps us understand your situation better.</p>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {(motivationV2 ? REASON_OPTIONS_V2 : REASON_OPTIONS).map((option) => renderOptionButton(option, surveyData.reason, "reason"))}
             </div>
           </div>
@@ -625,7 +625,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">Are you the legal homeowner?</h2>
               <p className="mt-1 text-sm text-gray-500">This helps us understand who we'll be working with.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {LEGAL_OWNER_OPTIONS.map((option) => renderOptionButton(option, surveyData.isLegalOwner, "isLegalOwner"))}
             </div>
           </div>
@@ -637,7 +637,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               <h2 className="text-2xl font-semibold text-gray-900">How long have you owned the home?</h2>
               <p className="mt-1 text-sm text-gray-500">This helps us tailor your offer.</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {OWNERSHIP_LENGTH_OPTIONS.map((option) => renderOptionButton(option, surveyData.ownershipLength, "ownershipLength"))}
             </div>
           </div>
@@ -742,7 +742,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
             variant="ghost"
             onClick={handleBack}
             disabled={step === 1}
-            className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-0"
+            className="h-12 px-5 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-0"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -750,7 +750,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
           <Button
             onClick={handleNext}
             disabled={!canProceed() || isSubmitting}
-            className="bg-[var(--accent)] text-white hover:bg-[var(--accent)] disabled:opacity-50"
+            className="h-12 px-6 text-base font-semibold bg-[var(--accent)] text-white hover:bg-[var(--accent)] disabled:opacity-50"
           >
             {isSubmitting ? (
               <span className="flex items-center gap-2">
