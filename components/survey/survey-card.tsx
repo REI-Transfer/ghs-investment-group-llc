@@ -575,7 +575,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">What condition is the property in?</h2>
-              <p className="mt-1 text-sm text-gray-500">Be honest - we buy houses in any condition.</p>
+              <p className="mt-1 text-sm text-gray-500">Be honest. We buy houses in any condition.</p>
             </div>
             <div className="flex flex-col gap-3">
               {CONDITION_OPTIONS.map((option) => renderOptionButton(option, surveyData.condition, "condition"))}

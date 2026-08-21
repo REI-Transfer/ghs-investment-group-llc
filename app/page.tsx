@@ -37,18 +37,22 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 py-4 md:py-6 lg:px-8">
           {/* Hero */}
           <div className="mx-auto text-center">
-            <h1 className={ibuykc ? "text-4xl font-extrabold leading-tight text-gray-900 md:text-5xl lg:text-[3.75rem] lg:leading-[1.15] text-balance" : "text-4xl font-extrabold leading-tight text-white md:text-5xl lg:text-[3.75rem] lg:leading-[1.15] text-balance"}>
-              {config.headline}
-              {config.headlineAccent && (
-                <span className={ibuykc ? "text-gray-900" : "text-white/80"}> {config.headlineAccent}</span>
-              )}
-            </h1>
-            <p className={ibuykc ? "mt-2 md:mt-3 text-base md:text-lg text-gray-600" : "mt-2 md:mt-3 text-base md:text-lg text-white/70"}>
-              {config.subheadline}
-            </p>
+            {config.headline && (
+              <h1 className={ibuykc ? "text-4xl font-extrabold leading-tight text-gray-900 md:text-5xl lg:text-[3.75rem] lg:leading-[1.15] text-balance" : "text-4xl font-extrabold leading-tight text-white md:text-5xl lg:text-[3.75rem] lg:leading-[1.15] text-balance"}>
+                {config.headline}
+                {config.headlineAccent && (
+                  <span className={ibuykc ? "text-gray-900" : "text-white/80"}> {config.headlineAccent}</span>
+                )}
+              </h1>
+            )}
+            {config.subheadline && (
+              <p className={ibuykc ? "mt-2 md:mt-3 text-base md:text-lg text-gray-600" : "mt-2 md:mt-3 text-base md:text-lg text-white/70"}>
+                {config.subheadline}
+              </p>
+            )}
 
             {/* Trust indicators — accent-colored checkmarks */}
-            <div className="mt-3 md:mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 md:gap-5">
+            <div className={`${config.headline || config.subheadline ? "mt-3 md:mt-4" : ""} flex flex-wrap items-center justify-center gap-x-4 gap-y-1 md:gap-5`}>
               {stats.map((stat) => (
                 <div key={stat.label} className="flex items-center gap-1.5">
                   <div
