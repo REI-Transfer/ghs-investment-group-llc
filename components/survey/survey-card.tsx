@@ -233,7 +233,7 @@ interface SurveyCardProps {
 }
 
 export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "8000000000", serviceAreas = [], disqualifiedPropertyTypes = ["mobile-home", "land", "other"], disqualifiedOwnershipLengths = [], allowedStates = [], initialAddress, initialStep, motivationV2 = false }: SurveyCardProps) {
-  const [step, setStep] = useState(initialStep && initialStep >= 2 && initialStep <= 8 ? initialStep : 1)
+  const [step, setStep] = useState(initialStep && initialStep >= 1 && initialStep <= 9 ? initialStep : 1)
   const [surveyData, setSurveyData] = useState<SurveyData>({
     address: initialAddress ?? "",
     propertyType: "",
@@ -252,7 +252,7 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isDisqualified, setIsDisqualified] = useState(false)
   const [disqualifyReason, setDisqualifyReason] = useState("")
-  const [addressVerified, setAddressVerified] = useState(false)
+  const [addressVerified, setAddressVerified] = useState(Boolean(initialAddress))
   const [addressOutOfArea, setAddressOutOfArea] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({})
@@ -263,11 +263,22 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
   }, [])
   const [honeypot, setHoneypot] = useState("")
 
+  // Step order (Propstor structure): 1 type, 2 condition, 3 listed, 4 timeline,
+  // 5 reason, 6 legal owner, 7 ownership length, 8 address, 9 contact.
+  const ADDRESS_STEP = 8
   const totalSteps = 9
+  // Advertorial seeds the address from its own autocomplete — skip step 8 then.
+  const addressPrefilled = Boolean(initialAddress && initialAddress.trim().length > 0)
+  const visibleSteps = addressPrefilled ? totalSteps - 1 : totalSteps
+  const displayStep = addressPrefilled && step > ADDRESS_STEP ? step - 1 : step
+  const advance = (from: number) => {
+    const next = from + 1
+    setStep(addressPrefilled && next === ADDRESS_STEP ? next + 1 : next)
+  }
 
   const handleNext = async () => {
     // Block out-of-area addresses on Continue with a disqualify screen
-    if (step === 1 && addressOutOfArea) {
+    if (step === ADDRESS_STEP && addressOutOfArea) {
       setDisqualifyReason("outOfArea")
       setIsDisqualified(true)
       return
@@ -365,24 +376,27 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
 
       window.location.href = '/thank-you'
     } else if (step < totalSteps) {
-      setStep(step + 1)
+      advance(step)
     }
   }
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1)
+    if (step > 1) {
+      const prev = step - 1
+      setStep(addressPrefilled && prev === ADDRESS_STEP ? prev - 1 : prev)
+    }
   }
 
   const canProceed = () => {
     switch (step) {
-      case 1: return surveyData.address.trim().length > 0 && addressVerified
-      case 2: return surveyData.propertyType !== ""
-      case 3: return surveyData.isLegalOwner !== ""
-      case 4: return surveyData.listedOnMarket !== ""
-      case 5: return surveyData.timeline !== ""
-      case 6: return surveyData.condition !== ""
-      case 7: return surveyData.reason !== ""
-      case 8: return surveyData.ownershipLength !== ""
+      case 1: return surveyData.propertyType !== ""
+      case 2: return surveyData.condition !== ""
+      case 3: return surveyData.listedOnMarket !== ""
+      case 4: return surveyData.timeline !== ""
+      case 5: return surveyData.reason !== ""
+      case 6: return surveyData.isLegalOwner !== ""
+      case 7: return surveyData.ownershipLength !== ""
+      case 8: return surveyData.address.trim().length > 0 && addressVerified
       case 9: return (
         surveyData.firstName.trim().length > 0 &&
         surveyData.lastName.trim().length > 0 &&
@@ -422,14 +436,14 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
       return
     }
 
-    setTimeout(() => { if (step < totalSteps) setStep(step + 1) }, 300)
+    setTimeout(() => { if (step < totalSteps) advance(step) }, 300)
   }
 
   const handleAddressSelect = (address: string, _details: AddressDetails) => {
     setSurveyData({ ...surveyData, address })
     setAddressVerified(true)
     setAddressOutOfArea(false)
-    setTimeout(() => { setStep(2) }, 300)
+    setTimeout(() => { setStep(ADDRESS_STEP + 1) }, 300)
   }
 
   const renderOptionButton = (
@@ -531,14 +545,14 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Home className="h-5 w-5 text-[var(--accent)]" />
-            <span className="text-sm text-gray-600">Step {step} of {totalSteps}</span>
+            <span className="text-sm text-gray-600">Step {displayStep} of {visibleSteps}</span>
           </div>
           <div className="flex gap-1">
-            {Array.from({ length: totalSteps }).map((_, i) => (
+            {Array.from({ length: visibleSteps }).map((_, i) => (
               <div
                 key={i}
                 className={`h-1.5 w-6 rounded-full transition-colors ${
-                  i < step ? "bg-[var(--accent)]" : "bg-gray-200"
+                  i < displayStep ? "bg-[var(--accent)]" : "bg-gray-200"
                 }`}
               />
             ))}
@@ -546,6 +560,90 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
         </div>
 
         {step === 1 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">What type of property is it?</h2>
+              <p className="mt-1 text-sm text-gray-500">Select the option that best describes your property.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {PROPERTY_TYPE_OPTIONS.map((option) => renderOptionButton(option, surveyData.propertyType, "propertyType"))}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">What condition is the property in?</h2>
+              <p className="mt-1 text-sm text-gray-500">Be honest - we buy houses in any condition.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {CONDITION_OPTIONS.map((option) => renderOptionButton(option, surveyData.condition, "condition"))}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">Is the property currently listed on the market?</h2>
+              <p className="mt-1 text-sm text-gray-500">Let us know if the property is currently for sale.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {LISTED_OPTIONS.map((option) => renderOptionButton(option, surveyData.listedOnMarket, "listedOnMarket"))}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">How fast are you looking to sell?</h2>
+              <p className="mt-1 text-sm text-gray-500">Select your ideal timeline for closing.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {TIMELINE_OPTIONS.map((option) => renderOptionButton(option, surveyData.timeline, "timeline"))}
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">What's your reason for selling?</h2>
+              <p className="mt-1 text-sm text-gray-500">This helps us understand your situation better.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {(motivationV2 ? REASON_OPTIONS_V2 : REASON_OPTIONS).map((option) => renderOptionButton(option, surveyData.reason, "reason"))}
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">Are you the legal homeowner?</h2>
+              <p className="mt-1 text-sm text-gray-500">This helps us understand who we'll be working with.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {LEGAL_OWNER_OPTIONS.map((option) => renderOptionButton(option, surveyData.isLegalOwner, "isLegalOwner"))}
+            </div>
+          </div>
+        )}
+
+        {step === 7 && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">How long have you owned the home?</h2>
+              <p className="mt-1 text-sm text-gray-500">This helps us tailor your offer.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {OWNERSHIP_LENGTH_OPTIONS.map((option) => renderOptionButton(option, surveyData.ownershipLength, "ownershipLength"))}
+            </div>
+          </div>
+        )}
+
+        {step === 8 && (
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">What's your property address?</h2>
@@ -561,90 +659,6 @@ export function SurveyCard({ phoneDisplay = "(800) 000-0000", phoneHref = "80000
               placeholder="Start typing your address..."
             />
 
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">What type of property is it?</h2>
-              <p className="mt-1 text-sm text-gray-500">Select the option that best describes your property.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {PROPERTY_TYPE_OPTIONS.map((option) => renderOptionButton(option, surveyData.propertyType, "propertyType"))}
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Are you the legal homeowner?</h2>
-              <p className="mt-1 text-sm text-gray-500">This helps us understand who we'll be working with.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {LEGAL_OWNER_OPTIONS.map((option) => renderOptionButton(option, surveyData.isLegalOwner, "isLegalOwner"))}
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Is the property currently listed on the market?</h2>
-              <p className="mt-1 text-sm text-gray-500">Let us know if the property is currently for sale.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {LISTED_OPTIONS.map((option) => renderOptionButton(option, surveyData.listedOnMarket, "listedOnMarket"))}
-            </div>
-          </div>
-        )}
-
-        {step === 5 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">How fast are you looking to sell?</h2>
-              <p className="mt-1 text-sm text-gray-500">Select your ideal timeline for closing.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {TIMELINE_OPTIONS.map((option) => renderOptionButton(option, surveyData.timeline, "timeline"))}
-            </div>
-          </div>
-        )}
-
-        {step === 6 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">What condition is the property in?</h2>
-              <p className="mt-1 text-sm text-gray-500">Be honest - we buy houses in any condition.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {CONDITION_OPTIONS.map((option) => renderOptionButton(option, surveyData.condition, "condition"))}
-            </div>
-          </div>
-        )}
-
-        {step === 7 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">What's your reason for selling?</h2>
-              <p className="mt-1 text-sm text-gray-500">This helps us understand your situation better.</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {(motivationV2 ? REASON_OPTIONS_V2 : REASON_OPTIONS).map((option) => renderOptionButton(option, surveyData.reason, "reason"))}
-            </div>
-          </div>
-        )}
-
-        {step === 8 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">How long have you owned the home?</h2>
-              <p className="mt-1 text-sm text-gray-500">This helps us tailor your offer.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {OWNERSHIP_LENGTH_OPTIONS.map((option) => renderOptionButton(option, surveyData.ownershipLength, "ownershipLength"))}
-            </div>
           </div>
         )}
 

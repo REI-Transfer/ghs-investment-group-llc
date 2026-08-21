@@ -8,7 +8,7 @@ import { AddressAutocomplete, type AddressDetails, type ServiceArea } from "@/co
 // Shared v2 "equity-opportunity" advertorial for the rei-survey-template repo (serves Express,
 // Pathway, Pure Growth, etc. via per-project env). MARKET-NEUTRAL and config-driven: every brand,
 // owner, market, and phone comes from server props, so each project renders its own. Family B survey
-// card: seed with initialAddress + initialStep (no companyName prop). Sticky top bar opens a popup at
+// card: seed with initialAddress (no companyName prop). Sticky top bar opens a popup at
 // step 2. ALL inline + bottom CTAs open the popup (setModalOpen). No fake urgency, no countdowns.
 
 interface AdvertorialPageProps {
@@ -21,8 +21,8 @@ interface AdvertorialPageProps {
   headshotUrl?: string
   serviceAreas: ServiceArea[]
   // 2-letter US state codes to ALLOW (ALLOWED_STATES). Empty → no state gate.
-  // Must reach the sticky-bar AddressAutocomplete too: it seeds the modal at
-  // step 2, which skips SurveyCard's step-1 out-of-area check.
+  // Must reach the sticky-bar AddressAutocomplete too: it validates the address
+  // before seeding the modal, and SurveyCard then skips its own address step.
   allowedStates?: string[]
   // Forwarded to SurveyCard so the advertorial funnel honors MOTIVATION_V2 too.
   motivationV2?: boolean
@@ -399,7 +399,6 @@ export function AdvertorialPage({
               serviceAreas={serviceAreas}
               allowedStates={allowedStates}
               initialAddress={seeded?.address}
-              initialStep={seeded && seeded.state ? 2 : undefined}
               motivationV2={motivationV2}
             />
           </div>
