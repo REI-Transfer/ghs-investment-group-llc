@@ -149,19 +149,23 @@ export function HeroSection({ brand }: { brand: Brand }) {
             )}
           </div>
 
-          {/* Mobile — owner cut-out in a FIXED container so any headshot image
-              (varying dimensions/aspect) lands in the SAME spot, cleanly cropped,
-              and never overlaps the content above. Desktop uses the left column. */}
+          {/* Mobile — owner cut-out. Orientation-agnostic: the image renders at its
+              natural aspect ratio, capped to 300px tall AND the screen width, so
+              BOTH portrait and landscape headshots show in full — never cropped,
+              stretched, or overflowing. Desktop uses the left column. */}
           {hasPhoto && (
-            <div className="lg:hidden mt-8 w-full flex justify-center">
-              <div className="relative h-[300px] w-[220px] overflow-hidden">
+            <div className="lg:hidden mt-8 w-full flex flex-col items-center">
+              <div className="relative inline-block overflow-hidden">
                 <img
                   src={brand.foundersPhotoUrl}
                   alt={brand.ownerName ? `${brand.ownerName}, ${brand.companyName}` : brand.companyName}
-                  className="h-full w-full object-cover object-bottom"
+                  className="block max-h-[300px] w-auto max-w-full object-contain"
                 />
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white to-transparent" />
               </div>
+              {brand.foundersCaption && (
+                <p className="text-center text-sm text-[#5A6B7D] mt-2 max-w-xs">{brand.foundersCaption}</p>
+              )}
             </div>
           )}
         </div>
